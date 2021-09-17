@@ -8,6 +8,8 @@ import androidx.core.view.isVisible
 import com.example.googlemap.databinding.ActivityMainBinding
 import com.example.googlemap.model.LocationLatLngEntity
 import com.example.googlemap.model.SearchResultEntity
+import com.example.googlemap.reponse.search.Poi
+import com.example.googlemap.reponse.search.Pois
 import com.example.googlemap.utility.RetrofitUtil
 import kotlinx.coroutines.*
 import java.lang.Exception
@@ -33,7 +35,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         initViews()
         bindViews()
         initData()
-        setData()
     }
 
     private fun initViews() = with(binding) {
@@ -55,14 +56,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         adapter.notifyDataSetChanged()
     }
 
-    private fun setData() {
-        val dataList = (0..10).map {
+    private fun setData(pois: Pois) {
+        val dataList = pois.poi.map {
             SearchResultEntity(
-                name = "빌딩 $it",
-                fullAddress = "주소 $it",
+                name = it.name ?: "빌딩명 없음",
+                fullAddress = makeMainAdress(it) ,
                 locationLatLng = LocationLatLngEntity(
-                    it.toFloat(),
-                    it.toFloat()
+                    it.noorLat,
+                    it.noorLon
                 )
             )
         }
@@ -82,6 +83,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                         val body = response.body()
                         withContext(Dispatchers.Main) {
                             Log.e("reponse", body.toString())
+                            body?.let { searchResponse ->
+                                setData(searchResponse.searchPoiInfo.pois)
+                            }
                         }
                     }
                 }
@@ -90,4 +94,21 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             }
         }
     }
+
+    private fun makeMainAdress(poi: Poi): String =
+        if (poi.secondNo?.trim().isNullOrEmpty()) {
+            (poi.upperAddrName?.trim() ?: "") + " " +
+                    (poi.middleAddrName?.trim() ?: "") + " " +
+                    (poi.lowerAddrName?.trim() ?: "") + " " +
+                    (poi.detailAddrName?.trim() ?: "") + " " +
+                    poi.firstNo?.trim()
+        } else {
+            (poi.upperAddrName?.trim() ?: "") + " " +
+                    (poi.middleAddrName?.trim() ?: "") + " " +
+                    (poi.lowerAddrName?.trim() ?: "") + " " +
+                    (poi.detailAddrName?.trim() ?: "") + " " +
+                    (poi.firstNo?.trim() ?: "") + " " +
+                    poi.secondNo?.trim()
+        }
+
 }
