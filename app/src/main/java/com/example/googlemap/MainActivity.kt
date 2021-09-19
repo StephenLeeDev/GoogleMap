@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import com.example.googlemap.MapActivity.Companion.SEARCH_RESULT_EXTRA_KEY
 import com.example.googlemap.databinding.ActivityMainBinding
 import com.example.googlemap.model.LocationLatLngEntity
 import com.example.googlemap.model.SearchResultEntity
@@ -70,7 +71,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         }
         adapter.setSearchResultList(dataList) {
             Toast.makeText(this, "name : ${it.name}, address : ${it.fullAddress}", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, MapActivity::class.java))
+            startActivity(Intent(this, MapActivity::class.java).apply {
+                putExtra(SEARCH_RESULT_EXTRA_KEY, it)
+            })
         }
     }
 
