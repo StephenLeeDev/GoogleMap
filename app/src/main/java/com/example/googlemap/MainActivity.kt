@@ -1,5 +1,6 @@
 package com.example.googlemap
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -69,6 +70,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         }
         adapter.setSearchResultList(dataList) {
             Toast.makeText(this, "name : ${it.name}, address : ${it.fullAddress}", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, MapActivity::class.java))
         }
     }
 
